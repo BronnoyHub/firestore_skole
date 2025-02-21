@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Firestore CRUD</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Google Firestore CRUD</h1>
+
+    <!-- Skjema for å legge til student -->
+    <h2>Legg til student</h2>
+    <form id="addStudentForm">
+        <label for="name">Navn:</label>
+        <input type="text" id="name" required><br>
+
+        <label for="age">Alder:</label>
+        <input type="number" id="age" required><br>
+
+        <label for="course">Kurs:</label>
+        <input type="text" id="course" required><br>
+
+        <button type="submit">Legg til student</button>
+    </form>
+
+    <!-- Vis studentene -->
+    <h2>Studenter</h2>
+    <ul id="studentList"></ul>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
