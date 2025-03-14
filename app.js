@@ -1,46 +1,69 @@
 // Firebase-konfigurasjon (erstatt med din egen fra Firebase Console)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
 // Firebase konfigurasjon
 const firebaseConfig = {
-    apiKey: "DIN_API_KEY",
-    authDomain: "DITT_PROSJEKT.firebaseapp.com",
-    projectId: "DITT_PROSJEKT_ID",
-    storageBucket: "DITT_PROSJEKT.appspot.com",
-    messagingSenderId: "DIN_MELDINGS_ID",
-    appId: "DIN_APP_ID"
-};
-
+    apiKey: "AIzaSyDlaxIKizc4cL6dAc7nPjldoGisVhPAJyI",
+    authDomain: "firestoreskole.firebaseapp.com",
+    projectId: "firestoreskole",
+    storageBucket: "firestoreskole.firebasestorage.app",
+    messagingSenderId: "849041079247",
+    appId: "1:849041079247:web:e02d300a8946c8916d30ba"
+  };
+  
 // Initialiser Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Referanse til "students" samlingen
-const studentCollection = collection(db, "students");
+// Referanse til "skoledb" samlingen
+const studentCollection = collection(db, "skoledb");
 
-// ** Legg til student **
-document.getElementById("addStudentForm").addEventListener("submit", async (e) => {
+// Håndter skjema
+const form = document.getElementById("addStudentForm");
+const nameInput = document.getElementById("name");
+const ageInput = document.getElementById("age");
+const courseInput = document.getElementById("course");
+const submitButton = document.getElementById("submitButton");
+
+let editingStudentId = null; // Lagrer ID for oppdatering
+
+// Legg til eller oppdater elev 
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const age = parseInt(document.getElementById("age").value);
-    const course = document.getElementById("course").value;
+    const name = nameInput.value;
+    const age = parseInt(ageInput.value);
+    const course = courseInput.value;
 
     try {
-        await addDoc(studentCollection, {
-            name: name,
-            age: age,
-            course: course
-        });
-        alert("Student lagt til!");
-        e.target.reset();
+        if (editingStudentId) {
+            // Oppdater eksisterende elev
+            await updateDoc(doc(db, "skoledb", editingStudentId), {
+                name: name,
+                age: age,
+                course: course
+            });
+            alert("Elev oppdatert!");
+            editingStudentId = null; // Tilbakestill ID etter oppdatering
+            submitButton.innerText = "Legg til elev"; // Endre knappetekst tilbake
+        } else {
+            // Legg til ny elev
+            await addDoc(studentCollection, {
+                name: name,
+                age: age,
+                course: course
+            });
+            alert("Elev lagt til!");
+        }
+
+        form.reset();
     } catch (error) {
         console.error("Feil ved lagring: ", error);
     }
 });
 
-// ** Les og vis studentene i sanntid **
+// ** Les og vis elever i sanntid **
 onSnapshot(studentCollection, (snapshot) => {
     const studentList = document.getElementById("studentList");
     studentList.innerHTML = ""; // Tøm listen før oppdatering
@@ -49,33 +72,27 @@ onSnapshot(studentCollection, (snapshot) => {
         const student = doc.data();
         const li = document.createElement("li");
         li.innerHTML = `${student.name} (${student.age} år) - ${student.course}
-        <button onclick="deleteStudent('${doc.id}')">🗑️ Slett</button>
-        <button onclick="updateStudent('${doc.id}', '${student.name}', ${student.age}, '${student.course}')">✏️ Oppdater</button>`;
+        <button onclick="deleteStudent('${doc.id}')">Slett</button>
+        <button onclick="editStudent('${doc.id}', '${student.name}', ${student.age}, '${student.course}')"> Oppdater</button>`;
 
         studentList.appendChild(li);
     });
 });
 
-// ** Slett student **
+// ** Slett elev **
 window.deleteStudent = async (id) => {
-    if (confirm("Er du sikker på at du vil slette denne studenten?")) {
-        await deleteDoc(doc(db, "students", id));
-        alert("Student slettet.");
+    if (confirm("Er du sikker på at du vil slette denne eleven?")) {
+        await deleteDoc(doc(db, "skoledb", id));
+        alert("Elev slettet.");
     }
 };
 
-// ** Oppdater student **
-window.updateStudent = async (id, name, age, course) => {
-    const newName = prompt("Nytt navn:", name);
-    const newAge = parseInt(prompt("Ny alder:", age));
-    const newCourse = prompt("Nytt kurs:", course);
+// ** Fyll skjema for oppdatering **
+window.editStudent = (id, name, age, course) => {
+    nameInput.value = name;
+    ageInput.value = age;
+    courseInput.value = course;
 
-    if (newName && newAge && newCourse) {
-        await updateDoc(doc(db, "students", id), {
-            name: newName,
-            age: newAge,
-            course: newCourse
-        });
-        alert("Student oppdatert!");
-    }
+    editingStudentId = id; // Lagre ID for oppdatering
+    submitButton.innerText = "Oppdater elev"; // Endre knappetekst
 };
