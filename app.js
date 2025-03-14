@@ -4,12 +4,12 @@ import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, o
 
 // Firebase konfigurasjon
 const firebaseConfig = {
-    apiKey: "AIzaSyDlaxIKizc4cL6dAc7nPjldoGisVhPAJyI",
+    apiKey: "bruk din egen",
     authDomain: "firestoreskole.firebaseapp.com",
     projectId: "firestoreskole",
     storageBucket: "firestoreskole.firebasestorage.app",
-    messagingSenderId: "849041079247",
-    appId: "1:849041079247:web:e02d300a8946c8916d30ba"
+    messagingSenderId: "bruk din egen",
+    appId: "1:bruk din egen"
   };
   
 // Initialiser Firebase
